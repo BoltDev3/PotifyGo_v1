@@ -316,7 +316,7 @@
   <aside class="sidebar">
     <div class="brand">POTIFY<span>.GO</span></div>
     <div class="credits">
-      BUILD_BY_BOLDDEV3
+      BUILD_BY_BOLTDEV3
       <a
         href="https://github.com/BoltDev3/PotifyGo"
         target="_blank"
