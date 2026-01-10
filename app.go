@@ -12,6 +12,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/wailsapp/wails/v2/pkg/runtime"
@@ -288,6 +289,13 @@ func (a *App) Download(songName string, playlistName string) string {
 		"--output", outputTemplate,
 		"ytsearch1:"+songName)
 
+	// --- HIER IST DER FIX FÜR DAS SCHWARZE FENSTER ---
+	cmd.SysProcAttr = &syscall.SysProcAttr{
+		HideWindow:    true,
+		CreationFlags: 0x08000000, // CREATE_NO_WINDOW
+	}
+	// ------------------------------------------------
+
 	stdout, _ := cmd.StdoutPipe()
 	cmd.Stderr = cmd.Stdout
 	_ = cmd.Start()
@@ -309,6 +317,9 @@ func (a *App) Download(songName string, playlistName string) string {
 
 	err = cmd.Wait()
 	if err != nil {
+		if a.isCancelling {
+			return "CANCELLED"
+		}
 		a.logToUI("DL_ERROR for " + songName + ": " + err.Error())
 		return "ERROR"
 	}
