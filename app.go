@@ -162,13 +162,19 @@ func (a *App) GetDownloadedSongs() []string {
 	if a.config.DownloadPath == "" {
 		return files
 	}
-	_ = filepath.WalkDir(a.config.DownloadPath, func(path string, d os.DirEntry, err error) error {
-		if err == nil && !d.IsDir() && strings.HasSuffix(strings.ToLower(d.Name()), ".mp3") {
+	err := filepath.WalkDir(a.config.DownloadPath, func(path string, d os.DirEntry, err error) error {
+		if err != nil {
+			return nil // Continue walking
+		}
+		if !d.IsDir() && strings.HasSuffix(strings.ToLower(d.Name()), ".mp3") {
 			name := strings.TrimSuffix(d.Name(), filepath.Ext(d.Name()))
 			files = append(files, name)
 		}
 		return nil
 	})
+	if err != nil {
+		a.logToUI("ERROR: Could not scan downloaded songs: " + err.Error())
+	}
 	return files
 }
 
